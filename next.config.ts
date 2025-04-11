@@ -4,7 +4,10 @@ const nextConfig = {
     domains: [
       "cdn2.penguin.com.au",
       "files.fm",
-      "m.media-amazon.com", // Added Amazon image domain
+      "m.media-amazon.com",
+      "upload.wikimedia.org", // Add more as needed
+      "images.unsplash.com",
+      "res.cloudinary.com",
     ],
   },
 };
