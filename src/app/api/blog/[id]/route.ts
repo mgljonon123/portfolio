@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from "next/server";
-import type { NextApiRequest } from "next";
 import prisma from "@/lib/prisma";
 import { authMiddleware, adminMiddleware } from "@/lib/auth";
 
