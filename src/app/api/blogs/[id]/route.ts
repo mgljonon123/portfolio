@@ -2,13 +2,15 @@ import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { authMiddleware, adminMiddleware } from "@/lib/auth";
 
-export async function GET(
-  request: NextRequest,
-  { params }: { params: { id: string } }
-) {
+function getIdFromRequest(request: NextRequest): string | null {
+  const urlParts = new URL(request.url).pathname.split("/");
+  return urlParts[urlParts.length - 1] || null;
+}
+
+export async function GET(request: NextRequest) {
   try {
-    const { id } = params;
-    if (!id || typeof id !== "string") {
+    const id = getIdFromRequest(request);
+    if (!id) {
       return NextResponse.json({ error: "Invalid blog ID" }, { status: 400 });
     }
 
@@ -58,21 +60,18 @@ export async function GET(
   }
 }
 
-export async function PUT(
-  request: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function PUT(request: NextRequest) {
   try {
+    const id = getIdFromRequest(request);
+    if (!id) {
+      return NextResponse.json({ error: "Invalid blog ID" }, { status: 400 });
+    }
+
     const authResponse = await authMiddleware(request);
     if (authResponse.status !== 200) return authResponse;
 
     const adminResponse = await adminMiddleware(request);
     if (adminResponse.status !== 200) return adminResponse;
-
-    const { id } = params;
-    if (!id || typeof id !== "string") {
-      return NextResponse.json({ error: "Invalid blog ID" }, { status: 400 });
-    }
 
     const data = await request.json();
     const { title, description, imageBlog, published, tags } = data;
@@ -152,21 +151,18 @@ export async function PUT(
   }
 }
 
-export async function DELETE(
-  request: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function DELETE(request: NextRequest) {
   try {
+    const id = getIdFromRequest(request);
+    if (!id) {
+      return NextResponse.json({ error: "Invalid blog ID" }, { status: 400 });
+    }
+
     const authResponse = await authMiddleware(request);
     if (authResponse.status !== 200) return authResponse;
 
     const adminResponse = await adminMiddleware(request);
     if (adminResponse.status !== 200) return adminResponse;
-
-    const { id } = params;
-    if (!id || typeof id !== "string") {
-      return NextResponse.json({ error: "Invalid blog ID" }, { status: 400 });
-    }
 
     const existingPost = await prisma.blog.findUnique({ where: { id } });
     if (!existingPost) {
@@ -192,21 +188,18 @@ export async function DELETE(
   }
 }
 
-export async function PATCH(
-  request: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function PATCH(request: NextRequest) {
   try {
+    const id = getIdFromRequest(request);
+    if (!id) {
+      return NextResponse.json({ error: "Invalid blog ID" }, { status: 400 });
+    }
+
     const authResponse = await authMiddleware(request);
     if (authResponse.status !== 200) return authResponse;
 
     const adminResponse = await adminMiddleware(request);
     if (adminResponse.status !== 200) return adminResponse;
-
-    const { id } = params;
-    if (!id || typeof id !== "string") {
-      return NextResponse.json({ error: "Invalid blog ID" }, { status: 400 });
-    }
 
     const body = await request.json();
     const { tags, ...blogUpdates } = body;
