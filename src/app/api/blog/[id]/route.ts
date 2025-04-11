@@ -45,12 +45,12 @@ export async function GET(
       published: blogPost.published,
       createdAt: blogPost.createdAt,
       updatedAt: blogPost.updatedAt,
-      tags: blogPost.blogTags.map((blogTag) => blogTag.tag),
+      tags: blogPost.blogTags.map((blogTag: { tag: any }) => blogTag.tag),
     };
 
     return NextResponse.json(formattedPost);
-  } catch (error) {
-    console.error("Error fetching blog post:", error);
+  } catch (err) {
+    console.error("Error fetching blog post:", err);
     return NextResponse.json(
       { error: "Failed to fetch blog post" },
       { status: 500 }
@@ -74,17 +74,9 @@ export async function PUT(
       return NextResponse.json({ error: "Invalid blog ID" }, { status: 400 });
     }
 
-    let data;
-    try {
-      data = await request.json();
-    } catch (error) {
-      return NextResponse.json(
-        { error: "Invalid JSON in request body" },
-        { status: 400 }
-      );
-    }
-
+    const data = await request.json();
     const { title, description, imageBlog, published, tags } = data;
+
     if (!title || !description) {
       return NextResponse.json(
         { error: "Title and description are required" },
@@ -112,27 +104,23 @@ export async function PUT(
     });
 
     if (tags && Array.isArray(tags)) {
-      try {
-        await prisma.blogTag.deleteMany({ where: { blogId: id } });
+      await prisma.blogTag.deleteMany({ where: { blogId: id } });
 
-        for (const tagName of tags) {
-          if (typeof tagName !== "string" || !tagName.trim()) continue;
+      for (const tagName of tags) {
+        if (typeof tagName !== "string" || !tagName.trim()) continue;
 
-          const tag = await prisma.tag.upsert({
-            where: { name: tagName.trim() },
-            update: {},
-            create: { name: tagName.trim() },
-          });
+        const tag = await prisma.tag.upsert({
+          where: { name: tagName.trim() },
+          update: {},
+          create: { name: tagName.trim() },
+        });
 
-          await prisma.blogTag.create({
-            data: {
-              blogId: id,
-              tagId: tag.id,
-            },
-          });
-        }
-      } catch (err) {
-        console.error("Error updating tags:", err);
+        await prisma.blogTag.create({
+          data: {
+            blogId: id,
+            tagId: tag.id,
+          },
+        });
       }
     }
 
@@ -151,12 +139,14 @@ export async function PUT(
       published: blogWithTags?.published,
       createdAt: blogWithTags?.createdAt,
       updatedAt: blogWithTags?.updatedAt,
-      tags: blogWithTags?.blogTags.map((blogTag) => blogTag.tag) || [],
+      tags:
+        blogWithTags?.blogTags.map((blogTag: { tag: any }) => blogTag.tag) ||
+        [],
     };
 
     return NextResponse.json(formattedPost);
-  } catch (error) {
-    console.error("Error updating blog post:", error);
+  } catch (err) {
+    console.error("Error updating blog post:", err);
     return NextResponse.json(
       { error: "Failed to update blog post" },
       { status: 500 }
@@ -188,20 +178,15 @@ export async function DELETE(
       );
     }
 
-    try {
-      await prisma.blogTag.deleteMany({ where: { blogId: id } });
-    } catch (err) {
-      console.error("Error deleting blog tags:", err);
-    }
-
+    await prisma.blogTag.deleteMany({ where: { blogId: id } });
     await prisma.blog.delete({ where: { id } });
 
     return NextResponse.json(
       { message: "Blog post deleted successfully" },
       { status: 200 }
     );
-  } catch (error) {
-    console.error("Error deleting blog post:", error);
+  } catch (err) {
+    console.error("Error deleting blog post:", err);
     return NextResponse.json(
       { error: "Failed to delete blog post" },
       { status: 500 }
@@ -225,15 +210,8 @@ export async function PATCH(
       return NextResponse.json({ error: "Invalid blog ID" }, { status: 400 });
     }
 
-    let body;
-    try {
-      body = await request.json();
-    } catch (error) {
-      return NextResponse.json(
-        { error: "Invalid JSON in request body" },
-        { status: 400 }
-      );
-    }
+    const body = await request.json();
+    const { tags, ...blogUpdates } = body;
 
     const existingPost = await prisma.blog.findUnique({ where: { id } });
     if (!existingPost) {
@@ -242,8 +220,6 @@ export async function PATCH(
         { status: 404 }
       );
     }
-
-    const { tags, ...blogUpdates } = body;
 
     await prisma.blog.update({
       where: { id },
@@ -254,27 +230,23 @@ export async function PATCH(
     });
 
     if (tags && Array.isArray(tags)) {
-      try {
-        await prisma.blogTag.deleteMany({ where: { blogId: id } });
+      await prisma.blogTag.deleteMany({ where: { blogId: id } });
 
-        for (const tagName of tags) {
-          if (typeof tagName !== "string" || !tagName.trim()) continue;
+      for (const tagName of tags) {
+        if (typeof tagName !== "string" || !tagName.trim()) continue;
 
-          const tag = await prisma.tag.upsert({
-            where: { name: tagName.trim() },
-            update: {},
-            create: { name: tagName.trim() },
-          });
+        const tag = await prisma.tag.upsert({
+          where: { name: tagName.trim() },
+          update: {},
+          create: { name: tagName.trim() },
+        });
 
-          await prisma.blogTag.create({
-            data: {
-              blogId: id,
-              tagId: tag.id,
-            },
-          });
-        }
-      } catch (err) {
-        console.error("Error updating tags:", err);
+        await prisma.blogTag.create({
+          data: {
+            blogId: id,
+            tagId: tag.id,
+          },
+        });
       }
     }
 
@@ -294,13 +266,15 @@ export async function PATCH(
           published: blogWithTags.published,
           createdAt: blogWithTags.createdAt,
           updatedAt: blogWithTags.updatedAt,
-          tags: blogWithTags.blogTags.map((blogTag) => blogTag.tag),
+          tags: blogWithTags.blogTags.map(
+            (blogTag: { tag: any }) => blogTag.tag
+          ),
         }
       : null;
 
     return NextResponse.json(formattedPost);
-  } catch (error) {
-    console.error("Error updating blog post:", error);
+  } catch (err) {
+    console.error("Error updating blog post:", err);
     return NextResponse.json(
       { error: "Failed to update blog post" },
       { status: 500 }

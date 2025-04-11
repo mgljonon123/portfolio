@@ -24,7 +24,7 @@ const SketchfabEmbed: React.FC<SketchfabEmbedProps> = ({
         if (!response.ok) {
           setError(true);
         }
-      } catch (err) {
+      } catch {
         setError(true);
       }
     };

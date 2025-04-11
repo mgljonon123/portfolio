@@ -10,17 +10,22 @@ interface Skill {
   percentage: number; // Maps to "proficiency" from the API
 }
 
+interface SkillApiResponse {
+  name: string;
+  proficiency: number;
+}
+
 const SkillsSection: React.FC = () => {
-  const [skills, setSkills] = useState<Skill[]>([]); // State to hold fetched skills
-  const [isLoading, setIsLoading] = useState(true); // Optional: Loading state
-  const [error, setError] = useState<string | null>(null); // Optional: Error state
+  const [skills, setSkills] = useState<Skill[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   const skillsRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const fetchSkills = async () => {
       try {
-        const token = localStorage.getItem("token"); // Get auth token if required
+        const token = localStorage.getItem("token");
         const response = await fetch("/api/skills", {
           headers: token ? { Authorization: `Bearer ${token}` } : {},
         });
@@ -29,18 +34,18 @@ const SkillsSection: React.FC = () => {
           throw new Error("Failed to fetch skills");
         }
 
-        const data = await response.json();
-        // Map API data to Skill interface (proficiency -> percentage)
-        const fetchedSkills: Skill[] = data.map((skill: any) => ({
+        const data: SkillApiResponse[] = await response.json();
+
+        const fetchedSkills: Skill[] = data.map((skill) => ({
           name: skill.name,
           percentage: skill.proficiency,
         }));
+
         setSkills(fetchedSkills);
         setError(null);
       } catch (err) {
         console.error("Error fetching skills:", err);
         setError("Failed to load skills. Please try again later.");
-        // Optional: Fallback to hardcoded skills on error
         setSkills([
           { name: "React", percentage: 90 },
           { name: "TypeScript", percentage: 87 },
@@ -54,7 +59,7 @@ const SkillsSection: React.FC = () => {
     };
 
     fetchSkills();
-  }, []); // Empty dependency array to fetch once on mount
+  }, []);
 
   useEffect(() => {
     if (skillsRef.current && skills.length > 0) {
@@ -70,7 +75,7 @@ const SkillsSection: React.FC = () => {
         }
       );
     }
-  }, [skills]); // Run animation when skills are updated
+  }, [skills]);
 
   return (
     <section className="px-36 py-9 mx-auto max-w-none min-h-screen bg-black max-md:p-5 max-md:max-w-[991px] max-sm:p-4 max-sm:max-w-screen-sm">

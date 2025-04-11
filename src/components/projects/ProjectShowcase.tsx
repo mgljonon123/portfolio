@@ -3,9 +3,9 @@
 import * as React from "react";
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import Image from "next/image";
 import styles from "./ProjectShowCcase.module.css";
 
-// Define the Blog interface based on your API response structure
 interface Tag {
   id: string;
   name: string;
@@ -69,11 +69,15 @@ const ProjectCard = ({
   return (
     <article className="flex bg-zinc-300 h-[386px] w-[806px] max-md:w-[650px] max-sm:flex-col max-sm:w-full max-sm:h-auto">
       {image ? (
-        <img
-          src={image}
-          alt={title}
-          className="h-full object-cover w-[357px] max-sm:w-full max-sm:h-[250px]"
-        />
+        <div className="relative h-full w-[357px] max-sm:w-full max-sm:h-[250px]">
+          <Image
+            src={image}
+            alt={title}
+            fill
+            className="object-cover"
+            sizes="(max-width: 768px) 100vw, 357px"
+          />
+        </div>
       ) : (
         <figure
           className="h-full bg-stone-500 w-[357px] max-sm:w-full max-sm:h-[250px]"
@@ -101,21 +105,21 @@ const variants = {
   enter: (direction: number) => ({
     x: direction > 0 ? 300 : -300,
     opacity: 0,
-    position: "absolute" as "absolute",
+    position: "absolute" as const,
   }),
   center: {
     x: 0,
     opacity: 1,
-    position: "relative" as "relative",
+    position: "relative" as const,
     transition: {
       duration: 0.5,
-      ease: "easeOut",
+      ease: "easeOut" as const,
     },
   },
   exit: (direction: number) => ({
     x: direction > 0 ? -300 : 300,
     opacity: 0,
-    position: "absolute" as "absolute",
+    position: "absolute" as const,
   }),
 };
 
@@ -131,18 +135,18 @@ const ProjectShowcase: React.FC = () => {
       try {
         setIsLoading(true);
 
-        // Fetch only published posts with the public parameter
         const response = await fetch("/api/blog?public=true");
 
         if (!response.ok) {
           throw new Error("Failed to fetch projects");
         }
 
-        const data = await response.json();
+        const data: Blog[] = await response.json();
         setBlogs(data);
-      } catch (err: any) {
-        console.error("Error fetching blogs:", err);
-        setError(err.message || "Something went wrong");
+      } catch (err) {
+        const typedError = err as Error;
+        console.error("Error fetching blogs:", typedError);
+        setError(typedError.message || "Something went wrong");
       } finally {
         setIsLoading(false);
       }
@@ -159,7 +163,6 @@ const ProjectShowcase: React.FC = () => {
     }
   };
 
-  // Show loading state
   if (isLoading) {
     return (
       <div className="h-screen flex justify-center items-center">
@@ -168,7 +171,6 @@ const ProjectShowcase: React.FC = () => {
     );
   }
 
-  // Show error state
   if (error || blogs.length === 0) {
     return (
       <div className="h-screen flex justify-center items-center">
@@ -185,63 +187,41 @@ const ProjectShowcase: React.FC = () => {
   const currentProject = blogs[currentIndex];
 
   return (
-    <>
-      <link
-        href="https://api.fontshare.com/v2/css?f[]=clash-display@200,300,400,500,600,700&display=swap"
-        rel="stylesheet"
+    <section
+      className={`${styles.container} h-screen flex relative justify-between items-center py-0 mx-auto w-full max-w-none max-md:px-2.5 max-md:py-0 max-sm:max-w-screen-sm overflow-hidden`}
+    >
+      <NavigationControl
+        direction="back"
+        onClick={() => paginate(-1)}
+        disabled={currentIndex === 0}
       />
-      <link
-        href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500&display=swap"
-        rel="stylesheet"
+
+      <div className="relative flex justify-center items-center w-[806px] max-md:w-[650px] max-sm:w-full h-[100vh]">
+        <AnimatePresence custom={direction} mode="wait">
+          <motion.div
+            key={currentIndex}
+            custom={direction}
+            variants={variants}
+            initial="enter"
+            animate="center"
+            exit="exit"
+          >
+            <ProjectCard
+              title={currentProject.title}
+              description={currentProject.description}
+              tags={currentProject.tags?.map((tag) => tag.name) || []}
+              image={currentProject.imageBlog}
+            />
+          </motion.div>
+        </AnimatePresence>
+      </div>
+
+      <NavigationControl
+        direction="next"
+        onClick={() => paginate(1)}
+        disabled={currentIndex === blogs.length - 1}
       />
-      <section
-        className={`${styles.container} h-screen flex relative justify-between items-center py-0 mx-auto w-full max-w-none max-md:px-2.5 max-md:py-0 max-sm:max-w-screen-sm overflow-hidden`}
-      >
-        <NavigationControl
-          direction="back"
-          onClick={() => paginate(-1)}
-          disabled={currentIndex === 0}
-        />
-
-        <div className="relative flex justify-center items-center w-[806px] max-md:w-[650px] max-sm:w-full h-[100vh]">
-          <AnimatePresence custom={direction} mode="wait">
-            <motion.div
-              key={currentIndex}
-              custom={direction}
-              variants={variants}
-              initial="enter"
-              animate="center"
-              exit="exit"
-            >
-              <ProjectCard
-                title={currentProject.title}
-                description={currentProject.description}
-                tags={currentProject.tags?.map((tag) => tag.name) || []}
-                image={currentProject.imageBlog}
-              />
-            </motion.div>
-          </AnimatePresence>
-        </div>
-
-        <NavigationControl
-          direction="next"
-          onClick={() => paginate(1)}
-          disabled={currentIndex === blogs.length - 1}
-        />
-      </section>
-
-      <style jsx global>{`
-        html,
-        body,
-        h2,
-        p {
-          font-family: "Clash Display", sans-serif;
-        }
-        .tag-badge {
-          font-family: "Roboto", sans-serif;
-        }
-      `}</style>
-    </>
+    </section>
   );
 };
 
