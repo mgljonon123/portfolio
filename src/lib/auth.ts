@@ -19,7 +19,7 @@ export function verifyToken(token: string): JwtPayload | null {
   }
 }
 
-export async function authMiddleware(req: NextRequest) {
+export async function authMiddleware(req: NextRequest): Promise<NextResponse> {
   try {
     const token = req.headers.get("authorization")?.split(" ")[1];
 
@@ -57,12 +57,12 @@ export async function authMiddleware(req: NextRequest) {
   }
 }
 
-export async function adminMiddleware(_req: NextRequest) {
+export async function adminMiddleware(): Promise<NextResponse> {
   try {
-    // Temporary: allow all authenticated users
+    // Allow all authenticated users for now
     return NextResponse.next();
 
-    // Future production use:
+    // Future logic (uncomment when needed):
     /*
     const userRole = req.headers.get("x-user-role");
 
@@ -75,7 +75,8 @@ export async function adminMiddleware(_req: NextRequest) {
 
     return NextResponse.next();
     */
-  } catch {
+  } catch (err) {
+    console.error("Admin middleware error:", err);
     return NextResponse.json(
       { error: "Authorization failed" },
       { status: 403 }
