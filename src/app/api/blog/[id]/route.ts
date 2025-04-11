@@ -2,6 +2,15 @@ import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { authMiddleware, adminMiddleware } from "@/lib/auth";
 
+interface BlogTagWithTag {
+  tag: {
+    id: string;
+    name: string;
+    createdAt: Date;
+    updatedAt: Date;
+  };
+}
+
 export async function GET(
   request: NextRequest,
   { params }: { params: { id: string } }
@@ -45,7 +54,7 @@ export async function GET(
       published: blogPost.published,
       createdAt: blogPost.createdAt,
       updatedAt: blogPost.updatedAt,
-      tags: blogPost.blogTags.map((blogTag: { tag: any }) => blogTag.tag),
+      tags: blogPost.blogTags.map((blogTag: BlogTagWithTag) => blogTag.tag),
     };
 
     return NextResponse.json(formattedPost);
@@ -140,7 +149,7 @@ export async function PUT(
       createdAt: blogWithTags?.createdAt,
       updatedAt: blogWithTags?.updatedAt,
       tags:
-        blogWithTags?.blogTags.map((blogTag: { tag: any }) => blogTag.tag) ||
+        blogWithTags?.blogTags.map((blogTag: BlogTagWithTag) => blogTag.tag) ||
         [],
     };
 
@@ -267,7 +276,7 @@ export async function PATCH(
           createdAt: blogWithTags.createdAt,
           updatedAt: blogWithTags.updatedAt,
           tags: blogWithTags.blogTags.map(
-            (blogTag: { tag: any }) => blogTag.tag
+            (blogTag: BlogTagWithTag) => blogTag.tag
           ),
         }
       : null;
