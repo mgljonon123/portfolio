@@ -1,125 +1,189 @@
 "use client";
-import * as React from "react";
 
-const NavigationControl = ({ direction }: { direction: "back" | "next" }) => {
+import * as React from "react";
+import { useState, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import styles from "./ProjectShowCcase.module.css";
+
+// Define the Blog interface based on your API response structure
+interface Tag {
+  id: string;
+  name: string;
+}
+
+interface Blog {
+  id: string;
+  title: string;
+  description: string;
+  imageBlog: string | null;
+  published: boolean;
+  createdAt: string;
+  updatedAt: string;
+  tags?: Tag[];
+}
+
+const NavigationControl = ({
+  direction,
+  onClick,
+  disabled,
+}: {
+  direction: "back" | "next";
+  onClick: () => void;
+  disabled: boolean;
+}) => {
   const isBack = direction === "back";
 
   return (
-    <div className="h-[569px] w-[243px] max-md:w-[180px] max-sm:hidden">
-      <div>
-        {isBack ? (
-          <svg
-            width="243"
-            height="569"
-            viewBox="0 0 243 569"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-            className="back-nav"
-          >
-            <rect width="243" height="569" fill="#D9D9D9"></rect>
-            <path
-              d="M111.707 261.707C112.098 261.317 112.098 260.683 111.707 260.293L105.343 253.929C104.953 253.538 104.319 253.538 103.929 253.929C103.538 254.319 103.538 254.953 103.929 255.343L109.586 261L103.929 266.657C103.538 267.047 103.538 267.681 103.929 268.071C104.319 268.462 104.953 268.462 105.343 268.071L111.707 261.707ZM25 262H111V260H25V262Z"
-              fill="black"
-            ></path>
-            <text
-              fill="black"
-              xmlSpace="preserve"
-              style={{ whiteSpace: "pre" }}
-              fontFamily="Clash Display"
-              fontSize="128"
-              fontWeight="300"
-              letterSpacing="0px"
-            >
-              <tspan x="129" y="134.219">
-                B
-              </tspan>
-              <tspan x="129" y="267.219">
-                a
-              </tspan>
-              <tspan x="129" y="400.219">
-                c
-              </tspan>
-              <tspan x="129" y="533.219">
-                k
-              </tspan>
-            </text>
-          </svg>
-        ) : (
-          <svg
-            width="243"
-            height="569"
-            viewBox="0 0 243 569"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-            className="next-nav"
-          >
-            <rect width="243" height="569" fill="#D9D9D9"></rect>
-            <path
-              d="M111.707 255.707C112.098 255.317 112.098dot 254.683 111.707 254.293L105.343 247.929C104.953 247.538 104.319 247.538 103.929 247.929C103.538 248.319 103.538 248.953 103.929 249.343L109.586 255L103.929 260.657C103.538 261.047 103.538 261.681 103.929 262.071C104.319 262.462 104.953 262.462 105.343 262.071L111.707 255.707ZM25 256H111V254H25V256Z"
-              fill="black"
-            ></path>
-            <text
-              fill="black"
-              xmlSpace="preserve"
-              style={{ whiteSpace: "pre" }}
-              fontFamily="Clash Display"
-              fontSize="128"
-              fontWeight="300"
-              letterSpacing="0px"
-            >
-              <tspan x="129" y="128.219">
-                N
-              </tspan>
-              <tspan x="129" y="261.219">
-                e
-              </tspan>
-              <tspan x="129" y="394.219">
-                x
-              </tspan>
-              <tspan x="129" y="527.219">
-                t
-              </tspan>
-            </text>
-          </svg>
-        )}
-      </div>
-    </div>
+    <button
+      onClick={onClick}
+      disabled={disabled}
+      className={`h-full w-[243px] max-md:w-[180px] max-sm:hidden flex justify-center items-center ${
+        disabled
+          ? "bg-neutral-200 text-neutral-500 cursor-not-allowed"
+          : "bg-neutral-300 hover:bg-neutral-400"
+      } text-black text-6xl font-light transition-all`}
+      aria-label={isBack ? "Back" : "Next"}
+    >
+      {isBack ? "Back" : "Next"}
+    </button>
   );
 };
 
-const TagBadge = ({ text }: { text: string }) => {
-  return (
-    <span className="px-1.5 py-0 text-xs font-light leading-5 text-white bg-orange-600 rounded h-[18px] tag-badge">
-      {text}
-    </span>
-  );
-};
+const TagBadge = ({ text }: { text: string }) => (
+  <span className="px-1.5 py-0 text-xs font-light leading-5 text-white bg-orange-600 rounded h-[18px] tag-badge">
+    {text}
+  </span>
+);
 
-const ProjectCard = () => {
+const ProjectCard = ({
+  title,
+  description,
+  tags,
+  image,
+}: {
+  title: string;
+  description: string;
+  tags: string[];
+  image: string | null;
+}) => {
   return (
     <article className="flex bg-zinc-300 h-[386px] w-[806px] max-md:w-[650px] max-sm:flex-col max-sm:w-full max-sm:h-auto">
-      <figure
-        className="h-full bg-stone-500 w-[357px] max-sm:w-full max-sm:h-[250px]"
-        aria-label="Project image"
-      />
+      {image ? (
+        <img
+          src={image}
+          alt={title}
+          className="h-full object-cover w-[357px] max-sm:w-full max-sm:h-[250px]"
+        />
+      ) : (
+        <figure
+          className="h-full bg-stone-500 w-[357px] max-sm:w-full max-sm:h-[250px]"
+          aria-label="Project image"
+        />
+      )}
       <div className="flex flex-col flex-1 items-center px-6 py-12 max-sm:p-6">
-        <h2 className="mb-3 text-3xl font-bold text-black">Title</h2>
+        <h2 className="mb-3 text-3xl font-bold text-black text-center">
+          {title}
+        </h2>
         <p className="mb-4 text-lg font-medium text-center text-black">
-          "Driven by curiosity and a love for clean design, I build digital
-          experiences that blend functionality with"
+          {description}
         </p>
         <div className="flex gap-2 max-sm:flex-wrap max-sm:justify-center">
-          <TagBadge text="T" />
-          <TagBadge text="TagBadge" />
-          <TagBadge text="TagBadge" />
-          <TagBadge text="TagBadge" />
+          {tags.map((tag, i) => (
+            <TagBadge key={i} text={tag} />
+          ))}
         </div>
       </div>
     </article>
   );
 };
 
-function ProjectShowcase() {
+const variants = {
+  enter: (direction: number) => ({
+    x: direction > 0 ? 300 : -300,
+    opacity: 0,
+    position: "absolute" as "absolute",
+  }),
+  center: {
+    x: 0,
+    opacity: 1,
+    position: "relative" as "relative",
+    transition: {
+      duration: 0.5,
+      ease: "easeOut",
+    },
+  },
+  exit: (direction: number) => ({
+    x: direction > 0 ? -300 : 300,
+    opacity: 0,
+    position: "absolute" as "absolute",
+  }),
+};
+
+const ProjectShowcase: React.FC = () => {
+  const [blogs, setBlogs] = useState<Blog[]>([]);
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [direction, setDirection] = useState(0);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchBlogs = async () => {
+      try {
+        setIsLoading(true);
+
+        // Fetch only published posts with the public parameter
+        const response = await fetch("/api/blog?public=true");
+
+        if (!response.ok) {
+          throw new Error("Failed to fetch projects");
+        }
+
+        const data = await response.json();
+        setBlogs(data);
+      } catch (err: any) {
+        console.error("Error fetching blogs:", err);
+        setError(err.message || "Something went wrong");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchBlogs();
+  }, []);
+
+  const paginate = (newDirection: number) => {
+    const newIndex = currentIndex + newDirection;
+    if (newIndex >= 0 && newIndex < blogs.length) {
+      setDirection(newDirection);
+      setCurrentIndex(newIndex);
+    }
+  };
+
+  // Show loading state
+  if (isLoading) {
+    return (
+      <div className="h-screen flex justify-center items-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-black"></div>
+      </div>
+    );
+  }
+
+  // Show error state
+  if (error || blogs.length === 0) {
+    return (
+      <div className="h-screen flex justify-center items-center">
+        <div className="text-center px-4">
+          <h2 className="text-2xl font-bold mb-2">
+            {error ? "Error" : "No Projects Available"}
+          </h2>
+          <p>{error || "Check back later for project updates!"}</p>
+        </div>
+      </div>
+    );
+  }
+
+  const currentProject = blogs[currentIndex];
+
   return (
     <>
       <link
@@ -130,10 +194,40 @@ function ProjectShowcase() {
         href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500&display=swap"
         rel="stylesheet"
       />
-      <section className="mt-[20] flex relative justify-between items-center py-0 mx-auto w-full max-w-none bg-zinc-800 h-[786px] max-md:px-2.5 max-md:py-0 max-md:max-w-[991px] max-sm:max-w-screen-sm">
-        <NavigationControl direction="back" />
-        <ProjectCard />
-        <NavigationControl direction="next" />
+      <section
+        className={`${styles.container} h-screen flex relative justify-between items-center py-0 mx-auto w-full max-w-none max-md:px-2.5 max-md:py-0 max-sm:max-w-screen-sm overflow-hidden`}
+      >
+        <NavigationControl
+          direction="back"
+          onClick={() => paginate(-1)}
+          disabled={currentIndex === 0}
+        />
+
+        <div className="relative flex justify-center items-center w-[806px] max-md:w-[650px] max-sm:w-full h-[100vh]">
+          <AnimatePresence custom={direction} mode="wait">
+            <motion.div
+              key={currentIndex}
+              custom={direction}
+              variants={variants}
+              initial="enter"
+              animate="center"
+              exit="exit"
+            >
+              <ProjectCard
+                title={currentProject.title}
+                description={currentProject.description}
+                tags={currentProject.tags?.map((tag) => tag.name) || []}
+                image={currentProject.imageBlog}
+              />
+            </motion.div>
+          </AnimatePresence>
+        </div>
+
+        <NavigationControl
+          direction="next"
+          onClick={() => paginate(1)}
+          disabled={currentIndex === blogs.length - 1}
+        />
       </section>
 
       <style jsx global>{`
@@ -149,6 +243,6 @@ function ProjectShowcase() {
       `}</style>
     </>
   );
-}
+};
 
 export default ProjectShowcase;

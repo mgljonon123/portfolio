@@ -1,6 +1,11 @@
+/** @type {import('next').NextConfig} */
 const nextConfig = {
   images: {
-    domains: ["images.unsplash.com"], // Add allowed image domains here
+    domains: [
+      "cdn2.penguin.com.au",
+      "files.fm",
+      "m.media-amazon.com", // Added Amazon image domain
+    ],
   },
 };
 

@@ -28,10 +28,7 @@ export default function RootLayout({
           rel="stylesheet"
         />
       </head>
-      <body className={`${robotoMono.variable} antialiased`}>
-        <Navbar></Navbar>
-        {children}
-      </body>
+      <body className={`${robotoMono.variable} antialiased`}>{children}</body>
     </html>
   );
 }

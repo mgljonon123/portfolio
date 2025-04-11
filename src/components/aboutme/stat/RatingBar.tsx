@@ -11,9 +11,9 @@ const RatingBar: React.FC<RatingBarProps> = ({ stars, percentage, width }) => {
 
   return (
     <div className="flex items-center">
-      {/* Reduced font size and width */}
+      {/* Reduced font size and width with Roboto and thin style */}
       <div
-        className={`text-[10px] font-semibold text-black  text-opacity-50 ${
+        className={`text-[10px] font-semibold text-black text-opacity-50 font-['Roboto'] ${
           stars === 1 ? "w-[30px]" : "w-[32px]"
         }`}
       >
@@ -41,8 +41,8 @@ const RatingBar: React.FC<RatingBarProps> = ({ stars, percentage, width }) => {
           />
         )}
       </div>
-      {/* Reduced font size */}
-      <div className="text-[10px] font-semibold text-black text-opacity-50">
+      {/* Reduced font size with Roboto and thin style */}
+      <div className="text-[10px] font-thin text-black text-opacity-50 font-['Roboto']">
         {percentage}%
       </div>
     </div>

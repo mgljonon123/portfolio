@@ -4,31 +4,56 @@
 import About from "@/components/aboutme/about";
 import CustomerReviews from "@/components/aboutme/stat/CustomerReviews";
 import TechBanner from "@/components/banners/techbanner1";
+import Contact from "@/components/contact/Contact";
+import PortoLanding from "@/components/footer/PortoLanding";
 import HeroSection from "@/components/herosection/HeroSection";
 import TechnicalSkills from "@/components/myskills/TechnicalSkills";
+import Navbar from "@/components/navbar/Navbar";
 import ProjectShowcase from "@/components/projects/ProjectShowcase";
-import ImageSlider from "@/components/projectuuud/imgslider/ImageSlider";
+import ProjectsShow from "@/components/projectuuud/realproject/projectshow";
+import Techs from "@/components/projectuuud/techs";
 
 export default function Page() {
   return (
-    <div className="z-1">
-      <HeroSection></HeroSection>
+    <div className="z-1 overflow-y-hidden">
+      <Navbar></Navbar>
+      <section id="">
+        <HeroSection></HeroSection>
+      </section>
       <TechBanner
-        mt="mt-35"
+        mt="mt-0"
         text={["TypeScript", "React", "Node.Js"]}
       ></TechBanner>
-      <ProjectShowcase></ProjectShowcase>
+      <section id="blog">
+        <ProjectShowcase></ProjectShowcase>
+      </section>
       <TechBanner
         mt="mt-0"
         text={["Next.js", "Tailwind", "Prisma"]}
       ></TechBanner>
-      <About></About>
-      <CustomerReviews></CustomerReviews>
+      <section id="about-me">
+        <About></About>
+      </section>
+      <section id="">
+        <CustomerReviews></CustomerReviews>
+      </section>
       <TechBanner
         mt="-0"
         text={["Productive", "Optimistic", "Phsycologist"]}
       ></TechBanner>
-      <TechnicalSkills></TechnicalSkills>
+      <section id="skills">
+        <TechnicalSkills></TechnicalSkills>
+      </section>
+      <TechBanner mt="0" text={["Figma", "Github", "MongoDB"]}></TechBanner>
+      <section id="projects">
+        <ProjectsShow></ProjectsShow>
+      </section>
+
+      <TechBanner mt="mt-0" text={["Instagram", "X", "Facebook"]}></TechBanner>
+      <section id="contact">
+        <Contact></Contact>
+      </section>
+      <PortoLanding></PortoLanding>
     </div>
   );
 }

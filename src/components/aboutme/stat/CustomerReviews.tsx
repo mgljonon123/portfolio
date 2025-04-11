@@ -13,7 +13,7 @@ const CustomerReviews: React.FC = () => {
 
   return (
     <section className="flex flex-col p-1 bg-white rounded-xl h-[203px] w-[198px] relative z-10 absolute top-[-850px] left-[575px]">
-      <header className="px-9 py-1 mb-4 text-sm font-bold text-black text-opacity-80">
+      <header className="px-9 py-1 mb-4 text-sm font-semibold text-black text-opacity-80 font-['Roboto']">
         Customer reviews
       </header>
       <div className="flex flex-col gap-2 px-2">

@@ -8,50 +8,78 @@ datasource db {
 }
 
 model User {
-  id           String   @id @default(auto()) @map("_id") @db.ObjectId
-  name         String
-  age          Int
-  coverImage   String
-  gmail        String   @unique
-  password     String
-  phoneNumber  String
-  location     String
-  updatedAt    DateTime @updatedAt
-
-  skills       Skill[]
-  projects     Project[]
-  aboutMe      AboutMe?
-}
-
-model Skill {
-  id          String   @id @default(auto()) @map("_id") @db.ObjectId
-  name        String
-  percentage  Int
-  userId      String?  @db.ObjectId
-  user        User?    @relation(fields: [userId], references: [id])
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  email     String   @unique
+  password  String
+  role      String   @default("user")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model Project {
   id           String   @id @default(auto()) @map("_id") @db.ObjectId
   title        String
   description  String
-  techStack    String[]
   image        String
-  liveDemo     String
-  userId       String?  @db.ObjectId
-  user         User?    @relation(fields: [userId], references: [id])
+  technologies String[]
+  githubUrl    String
+  liveUrl      String?
+  featured     Boolean  @default(false)
+  order        Int      @default(0)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 }
 
-model AboutMe {
-  id                String   @id @default(auto()) @map("_id") @db.ObjectId
-  title             String
-  description       String
-  techsUsed         String[]
-  yearsOfExperience Int
-  projectsCompleted Int
-  clientsSatisfied  Int
-  awardsReceived    Int
+model Skill {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  name        String
+  proficiency Int
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
 
-  userId            String   @unique @db.ObjectId
-  user              User     @relation(fields: [userId], references: [id])
+model About {
+  id           String   @id @default(auto()) @map("_id") @db.ObjectId
+  bio          String
+  profileImage String
+  email        String
+  updatedAt    DateTime @updatedAt
+}
+
+model Contact {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  name      String
+  email     String
+  message   String
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Blog {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  title       String
+  description String
+  imageBlog   String?  // Optional image for the blog
+  published   Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  blogTags    BlogTag[] // Explicit many-to-many relationship using BlogTag
+}
+
+model Tag {
+  id      String   @id @default(auto()) @map("_id") @db.ObjectId
+  name    String   @unique
+  blogTags BlogTag[] // Explicit many-to-many relationship using BlogTag
+}
+
+model BlogTag {
+  id      String @id @default(auto()) @map("_id") @db.ObjectId
+  blogId  String @db.ObjectId
+  tagId   String @db.ObjectId
+
+  blog    Blog   @relation(fields: [blogId], references: [id])
+  tag     Tag    @relation(fields: [tagId], references: [id])
+
+  @@unique([blogId, tagId]) // Unique constraint instead of composite primary key
 }
