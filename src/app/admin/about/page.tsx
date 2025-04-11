@@ -176,10 +176,11 @@ export default function AboutPage() {
                 </label>
                 <div className="flex items-center space-x-4">
                   <div className="relative h-32 w-32">
-                    <img
+                    <Image
                       src={imagePreview || formData.profileImage}
                       alt="Profile"
-                      className="absolute inset-0 w-full h-full object-cover rounded-lg"
+                      fill
+                      className="object-cover rounded-lg"
                       onError={(e) => {
                         console.error("Image loading error:", e);
                         e.currentTarget.src = "/profile-placeholder.svg";
@@ -256,7 +257,8 @@ export default function AboutPage() {
                     Profile Information
                   </h2>
                   <p className="text-gray-600 dark:text-gray-300 mt-2">
-                    Click "Edit About Me" to update your profile information.
+                    Click &quot;Edit About Me&quot; to update your profile
+                    information.
                   </p>
                 </div>
               </div>

@@ -12,7 +12,6 @@ export async function GET(
       return NextResponse.json({ error: "Invalid blog ID" }, { status: 400 });
     }
 
-    // For public access to published posts only, skip authentication
     const url = new URL(request.url);
     const isPublic = url.searchParams.get("public") === "true";
 
@@ -27,30 +26,17 @@ export async function GET(
     const blogPost = await prisma.blog.findUnique({
       where: { id },
       include: {
-        blogTags: {
-          include: {
-            tag: true,
-          },
-        },
+        blogTags: { include: { tag: true } },
       },
     });
 
-    if (!blogPost) {
+    if (!blogPost || (isPublic && !blogPost.published)) {
       return NextResponse.json(
         { error: "Blog post not found" },
         { status: 404 }
       );
     }
 
-    // If public request, only return published posts
-    if (isPublic && !blogPost.published) {
-      return NextResponse.json(
-        { error: "Blog post not found" },
-        { status: 404 }
-      );
-    }
-
-    // Transform the data to avoid circular references
     const formattedPost = {
       id: blogPost.id,
       title: blogPost.title,
@@ -88,12 +74,10 @@ export async function PUT(
       return NextResponse.json({ error: "Invalid blog ID" }, { status: 400 });
     }
 
-    // Use more robust error handling when parsing JSON
     let data;
     try {
       data = await request.json();
     } catch (error) {
-      console.error("Error parsing request JSON:", error);
       return NextResponse.json(
         { error: "Invalid JSON in request body" },
         { status: 400 }
@@ -101,7 +85,6 @@ export async function PUT(
     }
 
     const { title, description, imageBlog, published, tags } = data;
-
     if (!title || !description) {
       return NextResponse.json(
         { error: "Title and description are required" },
@@ -109,10 +92,7 @@ export async function PUT(
       );
     }
 
-    const existingPost = await prisma.blog.findUnique({
-      where: { id },
-    });
-
+    const existingPost = await prisma.blog.findUnique({ where: { id } });
     if (!existingPost) {
       return NextResponse.json(
         { error: "Blog post not found" },
@@ -120,38 +100,30 @@ export async function PUT(
       );
     }
 
-    // Update the blog post
-    const updatedPost = await prisma.blog.update({
+    await prisma.blog.update({
       where: { id },
       data: {
         title,
         description,
-        imageBlog: imageBlog !== undefined ? imageBlog : existingPost.imageBlog,
-        published: published !== undefined ? published : existingPost.published,
+        imageBlog: imageBlog ?? existingPost.imageBlog,
+        published: published ?? existingPost.published,
         updatedAt: new Date(),
       },
     });
 
-    // If tags are provided, update them
     if (tags && Array.isArray(tags)) {
       try {
-        // First, remove all existing tag connections
-        await prisma.blogTag.deleteMany({
-          where: { blogId: id },
-        });
+        await prisma.blogTag.deleteMany({ where: { blogId: id } });
 
-        // Then create new tag connections
         for (const tagName of tags) {
           if (typeof tagName !== "string" || !tagName.trim()) continue;
 
-          // Find or create the tag
           const tag = await prisma.tag.upsert({
             where: { name: tagName.trim() },
             update: {},
             create: { name: tagName.trim() },
           });
 
-          // Create the relationship
           await prisma.blogTag.create({
             data: {
               blogId: id,
@@ -161,23 +133,16 @@ export async function PUT(
         }
       } catch (err) {
         console.error("Error updating tags:", err);
-        // Continue with the response even if tag updates fail
       }
     }
 
-    // Fetch updated blog with tags
     const blogWithTags = await prisma.blog.findUnique({
       where: { id },
       include: {
-        blogTags: {
-          include: {
-            tag: true,
-          },
-        },
+        blogTags: { include: { tag: true } },
       },
     });
 
-    // Transform the data for response
     const formattedPost = {
       id: blogWithTags?.id,
       title: blogWithTags?.title,
@@ -215,10 +180,7 @@ export async function DELETE(
       return NextResponse.json({ error: "Invalid blog ID" }, { status: 400 });
     }
 
-    const existingPost = await prisma.blog.findUnique({
-      where: { id },
-    });
-
+    const existingPost = await prisma.blog.findUnique({ where: { id } });
     if (!existingPost) {
       return NextResponse.json(
         { error: "Blog post not found" },
@@ -227,19 +189,12 @@ export async function DELETE(
     }
 
     try {
-      // First, delete all tag connections
-      await prisma.blogTag.deleteMany({
-        where: { blogId: id },
-      });
+      await prisma.blogTag.deleteMany({ where: { blogId: id } });
     } catch (err) {
       console.error("Error deleting blog tags:", err);
-      // Continue with blog deletion even if tag deletion fails
     }
 
-    // Then, delete the blog post
-    await prisma.blog.delete({
-      where: { id },
-    });
+    await prisma.blog.delete({ where: { id } });
 
     return NextResponse.json(
       { message: "Blog post deleted successfully" },
@@ -270,23 +225,17 @@ export async function PATCH(
       return NextResponse.json({ error: "Invalid blog ID" }, { status: 400 });
     }
 
-    // Use more robust error handling when parsing JSON
     let body;
     try {
       body = await request.json();
     } catch (error) {
-      console.error("Error parsing request JSON:", error);
       return NextResponse.json(
         { error: "Invalid JSON in request body" },
         { status: 400 }
       );
     }
 
-    // Check if the blog post exists
-    const existingPost = await prisma.blog.findUnique({
-      where: { id },
-    });
-
+    const existingPost = await prisma.blog.findUnique({ where: { id } });
     if (!existingPost) {
       return NextResponse.json(
         { error: "Blog post not found" },
@@ -294,11 +243,9 @@ export async function PATCH(
       );
     }
 
-    // If tags are included, handle them separately
     const { tags, ...blogUpdates } = body;
 
-    // Update the blog post
-    const updatedPost = await prisma.blog.update({
+    await prisma.blog.update({
       where: { id },
       data: {
         ...blogUpdates,
@@ -306,26 +253,19 @@ export async function PATCH(
       },
     });
 
-    // If tags are provided, update them
     if (tags && Array.isArray(tags)) {
       try {
-        // First, remove all existing tag connections
-        await prisma.blogTag.deleteMany({
-          where: { blogId: id },
-        });
+        await prisma.blogTag.deleteMany({ where: { blogId: id } });
 
-        // Then create new tag connections
         for (const tagName of tags) {
           if (typeof tagName !== "string" || !tagName.trim()) continue;
 
-          // Find or create the tag
           const tag = await prisma.tag.upsert({
             where: { name: tagName.trim() },
             update: {},
             create: { name: tagName.trim() },
           });
 
-          // Create the relationship
           await prisma.blogTag.create({
             data: {
               blogId: id,
@@ -335,23 +275,16 @@ export async function PATCH(
         }
       } catch (err) {
         console.error("Error updating tags:", err);
-        // Continue with the response even if tag updates fail
       }
     }
 
-    // Fetch updated blog with tags
     const blogWithTags = await prisma.blog.findUnique({
       where: { id },
       include: {
-        blogTags: {
-          include: {
-            tag: true,
-          },
-        },
+        blogTags: { include: { tag: true } },
       },
     });
 
-    // Transform the data for response
     const formattedPost = blogWithTags
       ? {
           id: blogWithTags.id,

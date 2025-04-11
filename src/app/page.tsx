@@ -11,7 +11,6 @@ import TechnicalSkills from "@/components/myskills/TechnicalSkills";
 import Navbar from "@/components/navbar/Navbar";
 import ProjectShowcase from "@/components/projects/ProjectShowcase";
 import ProjectsShow from "@/components/projectuuud/realproject/projectshow";
-import Techs from "@/components/projectuuud/techs";
 
 export default function Page() {
   return (

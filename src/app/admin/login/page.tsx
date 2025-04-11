@@ -17,11 +17,8 @@ export default function LoginPage() {
     const date = new Date();
     date.setTime(date.getTime() + days * 24 * 60 * 60 * 1000);
     const expires = `expires=${date.toUTCString()}`;
-
-    // Check if we're in a secure context (HTTPS)
     const isSecure = window.location.protocol === "https:";
 
-    // Set cookie with appropriate flags
     document.cookie = `${name}=${value}; ${expires}; path=/; SameSite=Lax${
       isSecure ? "; Secure" : ""
     }`;
@@ -49,7 +46,7 @@ export default function LoginPage() {
         // Store token in cookie
         setCookie("token", data.token, 7);
 
-        // Also store in localStorage as backup
+        // Also store in localStorage
         if (typeof window !== "undefined") {
           localStorage.setItem("token", data.token);
         }
@@ -59,7 +56,7 @@ export default function LoginPage() {
         setError(data.error || "И-мэйл эсвэл нууц үг буруу байна");
         setIsLoading(false);
       }
-    } catch (err) {
+    } catch {
       setError("Алдаа гарлаа. Дахин оролдоно уу.");
       setIsLoading(false);
     }

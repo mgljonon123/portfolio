@@ -17,29 +17,17 @@ const CopyrightSection: React.FC = () => {
       const tl = gsap.timeline({
         scrollTrigger: {
           trigger: footerRef.current,
-          start: "top 80%", // Start when top of footer is 80% from top of viewport
-          end: "bottom 20%", // End when bottom of footer is 20% from top
-          toggleActions: "play none none none", // Only play on enter, no reverse
+          start: "top 80%",
+          end: "bottom 20%",
+          toggleActions: "play none none none",
           onLeaveBack: () => {
-            // When scrolling back up past the trigger, keep it visible
             gsap.set(textRef.current, { opacity: 1, y: 0, scale: 1 });
           },
           onEnter: () => {
-            // Only play animation when entering for the first time
             gsap.fromTo(
               textRef.current,
-              {
-                opacity: 0,
-                y: 100,
-                scale: 0.8,
-              },
-              {
-                opacity: 1,
-                y: 0,
-                scale: 1,
-                duration: 1.5,
-                ease: "power3.out",
-              }
+              { opacity: 0, y: 100, scale: 0.8 },
+              { opacity: 1, y: 0, scale: 1, duration: 1.5, ease: "power3.out" }
             );
           },
         },
@@ -50,9 +38,7 @@ const CopyrightSection: React.FC = () => {
 
       return () => {
         tl.kill();
-        ScrollTrigger.getAll().forEach((trigger: { kill: () => any }) =>
-          trigger.kill()
-        );
+        ScrollTrigger.getAll().forEach((trigger) => trigger.kill());
       };
     }
   }, []);

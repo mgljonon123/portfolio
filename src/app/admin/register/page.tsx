@@ -1,41 +1,41 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
-import Link from 'next/link';
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 export default function RegisterPage() {
   const router = useRouter();
   const [formData, setFormData] = useState({
-    email: '',
-    password: '',
-    confirmPassword: ''
+    email: "",
+    password: "",
+    confirmPassword: "",
   });
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError('');
+    setError("");
     setIsLoading(true);
 
     if (!formData.email || !formData.password || !formData.confirmPassword) {
-      setError('Бүх талбарыг бөглөнө үү.');
+      setError("Бүх талбарыг бөглөнө үү.");
       setIsLoading(false);
       return;
     }
 
     if (formData.password !== formData.confirmPassword) {
-      setError('Нууц үгнүүд таарахгүй байна');
+      setError("Нууц үгнүүд таарахгүй байна");
       setIsLoading(false);
       return;
     }
 
     try {
-      const response = await fetch('/api/auth/register', {
-        method: 'POST',
+      const response = await fetch("/api/auth/register", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
           email: formData.email,
@@ -46,12 +46,13 @@ export default function RegisterPage() {
       const data = await response.json();
 
       if (response.ok) {
-        router.push('/admin/login');
+        router.push("/admin/login");
       } else {
-        setError(data.error || 'Бүртгэл амжилтгүй боллоо');
+        setError(data.error || "Бүртгэл амжилтгүй боллоо");
       }
     } catch (err) {
-      setError('Алдаа гарлаа. Дахин оролдоно уу.');
+      console.error(err);
+      setError("Алдаа гарлаа. Дахин оролдоно уу.");
     } finally {
       setIsLoading(false);
     }
@@ -59,9 +60,9 @@ export default function RegisterPage() {
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }));
   };
 
@@ -73,14 +74,14 @@ export default function RegisterPage() {
             Админ бүртгэл
           </h2>
         </div>
-        
+
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
           {error && (
             <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative">
               {error}
             </div>
           )}
-          
+
           <div className="rounded-md shadow-sm -space-y-px">
             <div>
               <label htmlFor="email" className="sr-only">
@@ -131,15 +132,18 @@ export default function RegisterPage() {
               type="submit"
               disabled={isLoading}
               className={`group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white ${
-                isLoading ? 'bg-blue-400' : 'bg-blue-600 hover:bg-blue-700'
+                isLoading ? "bg-blue-400" : "bg-blue-600 hover:bg-blue-700"
               } focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500`}
             >
-              {isLoading ? 'Бүртгэж байна...' : 'Бүртгүүлэх'}
+              {isLoading ? "Бүртгэж байна..." : "Бүртгүүлэх"}
             </button>
           </div>
 
           <div className="text-sm text-center">
-            <Link href="/admin/login" className="font-medium text-blue-600 hover:text-blue-500 dark:text-blue-400">
+            <Link
+              href="/admin/login"
+              className="font-medium text-blue-600 hover:text-blue-500 dark:text-blue-400"
+            >
               Бүртгэлтэй юу? Нэвтрэх
             </Link>
           </div>
@@ -147,4 +151,4 @@ export default function RegisterPage() {
       </div>
     </div>
   );
-} 
+}

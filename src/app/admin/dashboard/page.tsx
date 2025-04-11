@@ -10,10 +10,19 @@ export default function DashboardPage() {
 
   useEffect(() => {
     const fetchData = async () => {
-      const projectsData = await fetch("/api/projects");
-      const skillsData = await fetch("/api/skills");
-      setTotalProjects(12);
-      setTotalSkills(8);
+      try {
+        const projectsRes = await fetch("/api/projects");
+        const projectsData = await projectsRes.json();
+
+        const skillsRes = await fetch("/api/skills");
+        const skillsData = await skillsRes.json();
+
+        // If the endpoints return arrays
+        setTotalProjects(projectsData.length);
+        setTotalSkills(skillsData.length);
+      } catch (error) {
+        console.error("Error fetching dashboard data:", error);
+      }
     };
     fetchData();
   }, []);

@@ -1,6 +1,6 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect } from "react";
 
 interface Contact {
   id: string;
@@ -15,7 +15,6 @@ export default function ContactPage() {
   const [contacts, setContacts] = useState<Contact[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [selectedContact, setSelectedContact] = useState<Contact | null>(null);
 
   useEffect(() => {
     fetchContacts();
@@ -24,98 +23,100 @@ export default function ContactPage() {
   const fetchContacts = async () => {
     try {
       setIsLoading(true);
-      
+
       // Get the token from localStorage
-      const token = localStorage.getItem('token');
-      
+      const token = localStorage.getItem("token");
+
       if (!token) {
-        throw new Error('Authentication required. Please log in again.');
+        throw new Error("Authentication required. Please log in again.");
       }
-      
-      const response = await fetch('/api/contact', {
+
+      const response = await fetch("/api/contact", {
         headers: {
-          'Authorization': `Bearer ${token}`,
+          Authorization: `Bearer ${token}`,
         },
       });
-      
+
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to fetch contacts');
+        throw new Error(errorData.error || "Failed to fetch contacts");
       }
-      
+
       const data = await response.json();
       setContacts(data);
       setError(null);
     } catch (err) {
-      console.error('Error fetching contacts:', err);
-      setError('Failed to load contacts. Please try again later.');
+      console.error("Error fetching contacts:", err);
+      setError("Failed to load contacts. Please try again later.");
     } finally {
       setIsLoading(false);
     }
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm('Are you sure you want to delete this message?')) {
+    if (!confirm("Are you sure you want to delete this message?")) {
       return;
     }
 
     try {
       // Get the token from localStorage
-      const token = localStorage.getItem('token');
-      
+      const token = localStorage.getItem("token");
+
       if (!token) {
-        throw new Error('Authentication required. Please log in again.');
+        throw new Error("Authentication required. Please log in again.");
       }
-      
+
       const response = await fetch(`/api/contact/${id}`, {
-        method: 'DELETE',
+        method: "DELETE",
         headers: {
-          'Authorization': `Bearer ${token}`,
+          Authorization: `Bearer ${token}`,
         },
       });
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to delete contact');
+        throw new Error(errorData.error || "Failed to delete contact");
       }
 
-      setContacts(contacts.filter(contact => contact.id !== id));
+      setContacts(contacts.filter((contact) => contact.id !== id));
     } catch (err) {
-      console.error('Error deleting contact:', err);
-      alert('Failed to delete contact. Please try again later.');
+      console.error("Error deleting contact:", err);
+      alert("Failed to delete contact. Please try again later.");
     }
   };
 
   const toggleReadStatus = async (id: string, currentReadStatus: boolean) => {
     try {
       // Get the token from localStorage
-      const token = localStorage.getItem('token');
-      
+      const token = localStorage.getItem("token");
+
       if (!token) {
-        throw new Error('Authentication required. Please log in again.');
+        throw new Error("Authentication required. Please log in again.");
       }
-      
+
       const response = await fetch(`/api/contact/${id}`, {
-        method: 'PUT',
+        method: "PUT",
         headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({ read: !currentReadStatus }),
       });
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to update contact status');
+        throw new Error(errorData.error || "Failed to update contact status");
       }
 
       const updatedContact = await response.json();
-      setContacts(contacts.map(contact => 
-        contact.id === id ? updatedContact : contact
-      ));
+      setContacts(
+        contacts.map((contact) =>
+          contact.id === id ? updatedContact : contact
+        )
+      );
     } catch (err) {
-      console.error('Error updating contact status:', err);
-      alert('Failed to update contact status. Please try again later.');
+      console.error("Error updating contact status:", err);
+      alert("Failed to update contact status. Please try again later.");
     }
   };
 
@@ -129,7 +130,10 @@ export default function ContactPage() {
 
   if (error) {
     return (
-      <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
+      <div
+        className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative"
+        role="alert"
+      >
         <strong className="font-bold">Error!</strong>
         <span className="block sm:inline"> {error}</span>
       </div>
@@ -162,7 +166,7 @@ export default function ContactPage() {
                 <div
                   key={contact.id}
                   className={`border dark:border-gray-700 rounded-lg p-4 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors ${
-                    !contact.read ? 'border-l-4 border-l-blue-500' : ''
+                    !contact.read ? "border-l-4 border-l-blue-500" : ""
                   }`}
                 >
                   <div className="flex justify-between items-start">
@@ -179,14 +183,16 @@ export default function ContactPage() {
                     </div>
                     <div className="flex space-x-2">
                       <button
-                        onClick={() => toggleReadStatus(contact.id, contact.read)}
+                        onClick={() =>
+                          toggleReadStatus(contact.id, contact.read)
+                        }
                         className={`px-2 py-1 text-xs rounded ${
-                          contact.read 
-                            ? 'bg-gray-200 text-gray-700 dark:bg-gray-700 dark:text-gray-300' 
-                            : 'bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300'
+                          contact.read
+                            ? "bg-gray-200 text-gray-700 dark:bg-gray-700 dark:text-gray-300"
+                            : "bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300"
                         }`}
                       >
-                        {contact.read ? 'Mark as Unread' : 'Mark as Read'}
+                        {contact.read ? "Mark as Unread" : "Mark as Read"}
                       </button>
                       <button
                         onClick={() => handleDelete(contact.id)}
@@ -207,4 +213,4 @@ export default function ContactPage() {
       </div>
     </div>
   );
-} 
+}

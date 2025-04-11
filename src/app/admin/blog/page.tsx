@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import Link from "next/link";
 
 interface Tag {
   id: string;
@@ -65,10 +64,12 @@ export default function BlogPage() {
       const data = await response.json();
       setBlogs(data);
       setError(null);
-    } catch (err: any) {
+    } catch (err: unknown) {
+      const errorMessage =
+        err instanceof Error ? err.message : "An unknown error occurred";
       console.error("Error fetching blog posts:", err);
       setError(
-        err.message || "Failed to load blog posts. Please try again later."
+        errorMessage || "Failed to load blog posts. Please try again later."
       );
     } finally {
       setIsLoading(false);
@@ -128,10 +129,12 @@ export default function BlogPage() {
       }
 
       setBlogs(blogs.filter((blog) => blog.id !== id));
-    } catch (err: any) {
+    } catch (err: unknown) {
+      const errorMessage =
+        err instanceof Error ? err.message : "An unknown error occurred";
       console.error("Error deleting blog post:", err);
       alert(
-        err.message || "Failed to delete blog post. Please try again later."
+        errorMessage || "Failed to delete blog post. Please try again later."
       );
     }
   };
@@ -164,10 +167,12 @@ export default function BlogPage() {
 
       const updatedBlog = await response.json();
       setBlogs(blogs.map((blog) => (blog.id === id ? updatedBlog : blog)));
-    } catch (err: any) {
+    } catch (err: unknown) {
+      const errorMessage =
+        err instanceof Error ? err.message : "An unknown error occurred";
       console.error("Error updating blog post status:", err);
       alert(
-        err.message ||
+        errorMessage ||
           "Failed to update blog post status. Please try again later."
       );
     }
@@ -260,13 +265,15 @@ export default function BlogPage() {
 
       // Refresh tags list
       fetchTags();
-    } catch (err: any) {
+    } catch (err: unknown) {
+      const errorMessage =
+        err instanceof Error ? err.message : "An unknown error occurred";
       console.error(
         `Error ${isEditing ? "updating" : "creating"} blog post:`,
         err
       );
       alert(
-        err.message ||
+        errorMessage ||
           `Failed to ${
             isEditing ? "update" : "create"
           } blog post. Please try again later.`
@@ -397,7 +404,7 @@ export default function BlogPage() {
                       onClick={() => handleRemoveTag(tag)}
                       className="ml-1 text-blue-800 hover:text-blue-900"
                     >
-                      &times;
+                      ×
                     </button>
                   </div>
                 ))}

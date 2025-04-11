@@ -18,7 +18,6 @@ const Contact: React.FC = () => {
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
-    const label = "ENTER YOUR NAME*";
     const { name, value } = e.target;
     setFormData((prev) => ({
       ...prev,
@@ -85,7 +84,7 @@ const Contact: React.FC = () => {
                 />
               </div>
             </div>
-            <SubmitBtn></SubmitBtn>
+            <SubmitBtn />
           </div>
         </form>
       </div>
@@ -133,7 +132,6 @@ const Contact: React.FC = () => {
           }
         }
 
-        /* Input focus animation (assumes FormInput/MessageInput have an input/textarea) */
         input:focus,
         textarea:focus {
           border-color: #000000;
