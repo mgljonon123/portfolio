@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import type { NextApiRequest } from "next";
 import prisma from "@/lib/prisma";
 import { authMiddleware, adminMiddleware } from "@/lib/auth";
 
@@ -11,12 +12,13 @@ interface BlogTagWithTag {
   };
 }
 
-export async function GET(
-  request: NextRequest,
-  { params }: { params: { id: string } }
-) {
+interface RouteContext {
+  params: { id: string };
+}
+
+export async function GET(request: NextRequest, context: RouteContext) {
   try {
-    const { id } = params;
+    const { id } = context.params;
     if (!id || typeof id !== "string") {
       return NextResponse.json({ error: "Invalid blog ID" }, { status: 400 });
     }
@@ -67,10 +69,7 @@ export async function GET(
   }
 }
 
-export async function PUT(
-  request: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function PUT(request: NextRequest, context: RouteContext) {
   try {
     const authResponse = await authMiddleware(request);
     if (authResponse.status !== 200) return authResponse;
@@ -78,7 +77,7 @@ export async function PUT(
     const adminResponse = await adminMiddleware(request);
     if (adminResponse.status !== 200) return adminResponse;
 
-    const { id } = params;
+    const { id } = context.params;
     if (!id || typeof id !== "string") {
       return NextResponse.json({ error: "Invalid blog ID" }, { status: 400 });
     }
@@ -163,10 +162,7 @@ export async function PUT(
   }
 }
 
-export async function DELETE(
-  request: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function DELETE(request: NextRequest, context: RouteContext) {
   try {
     const authResponse = await authMiddleware(request);
     if (authResponse.status !== 200) return authResponse;
@@ -174,7 +170,7 @@ export async function DELETE(
     const adminResponse = await adminMiddleware(request);
     if (adminResponse.status !== 200) return adminResponse;
 
-    const { id } = params;
+    const { id } = context.params;
     if (!id || typeof id !== "string") {
       return NextResponse.json({ error: "Invalid blog ID" }, { status: 400 });
     }
@@ -203,10 +199,7 @@ export async function DELETE(
   }
 }
 
-export async function PATCH(
-  request: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function PATCH(request: NextRequest, context: RouteContext) {
   try {
     const authResponse = await authMiddleware(request);
     if (authResponse.status !== 200) return authResponse;
@@ -214,7 +207,7 @@ export async function PATCH(
     const adminResponse = await adminMiddleware(request);
     if (adminResponse.status !== 200) return adminResponse;
 
-    const { id } = params;
+    const { id } = context.params;
     if (!id || typeof id !== "string") {
       return NextResponse.json({ error: "Invalid blog ID" }, { status: 400 });
     }
