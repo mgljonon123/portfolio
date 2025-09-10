@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Image from "next/image";
-
+// Comment nemeh
 interface AboutData {
   id?: string;
   bio: string;

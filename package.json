@@ -11,7 +11,7 @@
     "create-admin": "ts-node --compiler-options {\"module\":\"CommonJS\"} scripts/create-admin.ts"
   },
   "dependencies": {
-    "@prisma/client": "^6.6.0",
+    "@prisma/client": "^6.10.1",
     "bcryptjs": "^3.0.2",
     "crypto": "^1.0.1",
     "date-fns": "^4.1.0",
